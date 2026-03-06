@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ravi & Kazumi — Portfolio Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy: #2C3E50;
+    --gold: #D4A843;
+    --red: #C0392B;
+    --green: #27AE60;
+    --light: #F7F8FA;
+    --border: #E2E8F0;
+    --text: #334155;
+    --muted: #64748B;
+    --white: #FFFFFF;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--light); color: var(--text); line-height: 1.5; }
+
+  /* Header */
+  .header { background: var(--navy); color: white; padding: 32px 40px; }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: 1px; }
+  .header p { color: rgba(255,255,255,.6); font-size: 14px; margin-top: 4px; }
+  .header .subtitle { color: var(--gold); font-size: 15px; margin-top: 2px; font-weight: 500; }
+
+  /* Layout */
+  .container { max-width: 1320px; margin: 0 auto; padding: 24px 24px 60px; }
+
+  /* KPI row */
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .kpi { background: var(--white); border-radius: 12px; padding: 20px 22px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .kpi .label { font-size: 12px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin-bottom: 4px; }
+  .kpi .value { font-size: 26px; font-weight: 700; color: var(--navy); }
+  .kpi .value.up { color: var(--green); }
+  .kpi .value.down { color: var(--red); }
+  .kpi .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* Section */
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 14px; padding-bottom: 6px; border-bottom: 2px solid var(--gold); display: inline-block; }
+
+  /* Cards */
+  .card { background: var(--white); border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table th { background: var(--navy); color: white; padding: 10px 14px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+  table th:not(:first-child) { text-align: right; }
+  table td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+  table td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+  table tr:last-child td { border-bottom: none; }
+  table tr:hover { background: #f8fafc; }
+  table .total-row td { font-weight: 700; background: #f1f5f9; border-top: 2px solid var(--navy); }
+  .pill-up { color: var(--green); font-weight: 600; }
+  .pill-down { color: var(--red); font-weight: 600; }
+
+  /* Chart containers */
+  .chart-wrap { position: relative; height: 300px; }
+  .chart-wrap-sm { position: relative; height: 240px; }
+
+  /* Debt bar */
+  .debt-bar { display: flex; border-radius: 8px; overflow: hidden; height: 28px; margin-top: 10px; }
+  .debt-bar div { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; }
+
+  /* Footer */
+  .footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; border-top: 1px solid var(--border); margin-top: 20px; }
+
+  @media (max-width: 900px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .kpi-row { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>portfolio.</h1>
+  <div class="subtitle">RAVI & KAZUMI HOUSEHOLD</div>
+  <p>Performance Report &mdash; YTD January 01, 2026 &ndash; February 28, 2026</p>
+</div>
+
+<div class="container">
+
+<!-- ============ KPI ROW ============ -->
+<div class="kpi-row">
+  <div class="kpi">
+    <div class="label">Global Portfolio</div>
+    <div class="value">$1,536,010</div>
+    <div class="sub">US $884,897 + India $651,113</div>
+  </div>
+  <div class="kpi">
+    <div class="label">US Net Worth</div>
+    <div class="value">$1,262,857</div>
+    <div class="sub">Portfolio + Home &minus; Debt</div>
+  </div>
+  <div class="kpi">
+    <div class="label">YTD Return (Global)</div>
+    <div class="value down">-6.30%</div>
+    <div class="sub">US -7.90% &middot; India -4.60%</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Long-term MWRR</div>
+    <div class="value up">+14.93%</div>
+    <div class="sub">US since Mar 2015</div>
+  </div>
+  <div class="kpi">
+    <div class="label">India MWRR</div>
+    <div class="value up">+15.84%</div>
+    <div class="sub">Since Apr 2022</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Debt-to-Portfolio</div>
+    <div class="value">22.71%</div>
+    <div class="sub">Total Debt $348,840</div>
+  </div>
+</div>
+
+<!-- ============ PERFORMANCE SUMMARY ============ -->
+<div class="section">
+  <div class="section-title">Global Performance Summary</div>
+  <div class="grid-2">
+    <div class="card">
+      <table>
+        <thead><tr><th>Period</th><th>Global</th><th>US PF</th><th>India (INR)</th></tr></thead>
+        <tbody>
+          <tr><td>1 Month</td><td class="pill-down">-4.00%</td><td class="pill-down">-5.60%</td><td class="pill-down">-0.30%</td></tr>
+          <tr><td>3 Months</td><td class="pill-down">-7.67%</td><td class="pill-down">-8.05%</td><td class="pill-down">-5.62%</td></tr>
+          <tr><td>YTD</td><td class="pill-down">-6.30%</td><td class="pill-down">-7.90%</td><td class="pill-down">-4.60%</td></tr>
+          <tr><td>1 Year</td><td class="pill-down">-1.21%</td><td class="pill-up">+2.47%</td><td class="pill-up">+1.57%</td></tr>
+          <tr><td>3 Years (ann.)</td><td class="pill-up">+20.78%</td><td class="pill-up">+21.49%</td><td class="pill-up">+23.34%</td></tr>
+          <tr><td>5 Years (ann.)</td><td>&mdash;</td><td class="pill-up">+10.86%</td><td>&mdash;</td></tr>
+          <tr><td>Since Inception</td><td class="pill-up">+11.50%</td><td class="pill-up">+14.93%</td><td class="pill-up">+15.84%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="chart-wrap"><canvas id="perfChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ANNUAL RETURNS ============ -->
+<div class="section">
+  <div class="section-title">Annual Returns History</div>
+  <div class="grid-2">
+    <div class="card">
+      <table>
+        <thead><tr><th>Year</th><th>Global</th><th>US PF</th><th>India (INR)</th></tr></thead>
+        <tbody>
+          <tr><td>2024</td><td class="pill-up">+34.21%</td><td class="pill-up">+30.91%</td><td class="pill-up">+39.16%</td></tr>
+          <tr><td>2025</td><td class="pill-down">-1.21%</td><td class="pill-up">+11.94%</td><td class="pill-down">-7.40%</td></tr>
+          <tr><td>2026 (YTD)</td><td class="pill-down">-2.34%</td><td class="pill-down">-2.50%</td><td class="pill-down">-4.28%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="chart-wrap-sm"><canvas id="annualChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ US ACCOUNTS ============ -->
+<div class="section">
+  <div class="section-title">US Account Breakdown</div>
+  <div class="grid-2">
+    <div class="card">
+      <table>
+        <thead><tr><th>Account</th><th>Balance</th><th>% of US PF</th></tr></thead>
+        <tbody>
+          <tr><td>Fidelity (Ravi)</td><td>$344,305</td><td>38.9%</td></tr>
+          <tr><td>Alight (401k)</td><td>$153,533</td><td>17.4%</td></tr>
+          <tr><td>Vanguard</td><td>$117,257</td><td>13.3%</td></tr>
+          <tr><td>Fidelity (Zu)</td><td>$80,532</td><td>9.1%</td></tr>
+          <tr><td>Utah 529</td><td>$45,724</td><td>5.2%</td></tr>
+          <tr><td>Empower (403b)</td><td>$44,003</td><td>5.0%</td></tr>
+          <tr><td>Bitkey</td><td>$23,826</td><td>2.7%</td></tr>
+          <tr><td>E*TRADE ESPP</td><td>$23,592</td><td>2.7%</td></tr>
+          <tr><td>Roth IRA (Zu)</td><td>$16,576</td><td>1.9%</td></tr>
+          <tr><td>M1 Finance</td><td>$16,576</td><td>1.9%</td></tr>
+          <tr><td>Interactive Brokers</td><td>$10,778</td><td>1.2%</td></tr>
+          <tr><td>Venmo</td><td>$5,926</td><td>0.7%</td></tr>
+          <tr><td>Roth IRA (Ravi)</td><td>$1,412</td><td>0.2%</td></tr>
+          <tr><td>Cashapp</td><td>$830</td><td>0.1%</td></tr>
+          <tr><td>TD Ameritrade</td><td>$27</td><td>0.0%</td></tr>
+          <tr class="total-row"><td>TOTAL</td><td>$884,897</td><td>100.0%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="chart-wrap"><canvas id="usAccountChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ US PORTFOLIO BY PURPOSE ============ -->
+<div class="section">
+  <div class="section-title">US Portfolio by Purpose</div>
+  <div class="grid-2">
+    <div class="card">
+      <table>
+        <thead><tr><th>Purpose</th><th>Amount</th><th>% of Total</th></tr></thead>
+        <tbody>
+          <tr><td>Non-Retirement / Liquid</td><td>$569,823</td><td>64.4%</td></tr>
+          <tr><td>Retirement</td><td>$215,524</td><td>24.4%</td></tr>
+          <tr><td>529 Education</td><td>$75,724</td><td>8.6%</td></tr>
+          <tr><td>Crypto</td><td>$23,826</td><td>2.7%</td></tr>
+          <tr class="total-row"><td>TOTAL</td><td>$884,897</td><td>100.0%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="chart-wrap-sm"><canvas id="purposeChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ INDIA ACCOUNTS ============ -->
+<div class="section">
+  <div class="section-title">India Account Performance</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Account</th><th>MWRR</th><th>TWRR</th><th>Type</th></tr></thead>
+      <tbody>
+        <tr><td>Unlisted</td><td class="pill-up">40.75%</td><td>37.27%</td><td>Private equity</td></tr>
+        <tr><td>Stallion</td><td class="pill-up">28.85%</td><td>28.37%</td><td>PMS</td></tr>
+        <tr><td>Kite</td><td class="pill-up">26.09%</td><td>26.67%</td><td>Direct equity</td></tr>
+        <tr><td>IFA Planet</td><td class="pill-up">18.32%</td><td>18.62%</td><td>Mutual funds</td></tr>
+        <tr><td>SK (Dad)</td><td class="pill-up">16.99%</td><td>16.89%</td><td>Direct equity</td></tr>
+        <tr><td>SK (Mom)</td><td class="pill-up">12.95%</td><td>13.08%</td><td>Direct equity</td></tr>
+        <tr><td>Kuvera (Dad)</td><td class="pill-up">12.88%</td><td>11.75%</td><td>Mutual funds</td></tr>
+        <tr><td>NPS</td><td class="pill-up">10.58%</td><td>10.58%</td><td>National Pension</td></tr>
+        <tr><td>CMW (Dad)</td><td class="pill-up">9.68%</td><td>9.68%</td><td>PMS</td></tr>
+        <tr><td>CMW (Mom)</td><td class="pill-up">8.40%</td><td>8.40%</td><td>PMS</td></tr>
+        <tr><td>Coin</td><td class="pill-up">7.95%</td><td>17.19%</td><td>Mutual funds</td></tr>
+        <tr><td>Kuvera (Mom)</td><td class="pill-up">7.28%</td><td>8.88%</td><td>Mutual funds</td></tr>
+        <tr><td>Vested</td><td class="pill-up">1.20%</td><td>1.20%</td><td>US stocks (India)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ ASSET ALLOCATION ============ -->
+<div class="section">
+  <div class="section-title">Asset Allocation</div>
+  <div class="grid-3">
+    <div class="card">
+      <h4 style="font-size:13px;color:var(--muted);margin-bottom:12px;">Global Split</h4>
+      <div class="chart-wrap-sm"><canvas id="globalSplitChart"></canvas></div>
+    </div>
+    <div class="card">
+      <h4 style="font-size:13px;color:var(--muted);margin-bottom:12px;">US Asset Classes</h4>
+      <div class="chart-wrap-sm"><canvas id="usAssetChart"></canvas></div>
+    </div>
+    <div class="card">
+      <h4 style="font-size:13px;color:var(--muted);margin-bottom:12px;">Debt Breakdown</h4>
+      <div style="margin-top:30px;">
+        <table>
+          <thead><tr><th>Category</th><th>Amount</th></tr></thead>
+          <tbody>
+            <tr><td>Mortgage</td><td>$277,736</td></tr>
+            <tr><td>Auto Loan</td><td>$51,129</td></tr>
+            <tr><td>Other</td><td>$19,975</td></tr>
+            <tr class="total-row"><td>Total Debt</td><td>$348,840</td></tr>
+          </tbody>
+        </table>
+        <div class="debt-bar">
+          <div style="width:79.6%;background:var(--navy);">Mortgage 79.6%</div>
+          <div style="width:14.7%;background:var(--gold);">Auto 14.7%</div>
+          <div style="width:5.7%;background:var(--muted);">5.7%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TOP US HOLDINGS ============ -->
+<div class="section">
+  <div class="section-title">Top US Holdings</div>
+  <div class="card" style="overflow-x:auto;">
+    <table>
+      <thead><tr><th>Security</th><th>Shares</th><th>Cost Basis</th><th>Current Value</th><th>P/L</th><th>P/L %</th></tr></thead>
+      <tbody id="holdingsBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ VINTAGE YEAR ============ -->
+<div class="section">
+  <div class="section-title">Stock Picks by Vintage Year</div>
+  <div class="grid-2">
+    <div class="card">
+      <h4 style="font-size:13px;color:var(--muted);margin-bottom:10px;">US Stock Picks</h4>
+      <table>
+        <thead><tr><th>Year</th><th># Picks</th><th>Total Cost</th><th>Current</th><th>% Profit</th></tr></thead>
+        <tbody>
+          <tr><td>2026</td><td>14</td><td>$59,863</td><td>$76,388</td><td class="pill-up">+27.6%</td></tr>
+          <tr><td>2025</td><td>86</td><td>$98,474</td><td>$148,772</td><td class="pill-up">+51.1%</td></tr>
+          <tr><td>2024</td><td>90</td><td>$94,422</td><td>$120,896</td><td class="pill-up">+28.0%</td></tr>
+          <tr><td>2023</td><td>103</td><td>$78,053</td><td>$119,237</td><td class="pill-up">+52.8%</td></tr>
+          <tr><td>2022</td><td>105</td><td>$92,432</td><td>$132,484</td><td class="pill-up">+43.3%</td></tr>
+          <tr><td>2021</td><td>54</td><td>$84,265</td><td>$115,883</td><td class="pill-up">+37.5%</td></tr>
+          <tr><td>2020</td><td>22</td><td>$7,679</td><td>$20,182</td><td class="pill-up">+162.8%</td></tr>
+          <tr><td>2019</td><td>2</td><td>$880</td><td>$1,191</td><td class="pill-up">+35.3%</td></tr>
+          <tr><td>2018</td><td>3</td><td>$18,725</td><td>$59,343</td><td class="pill-up">+216.9%</td></tr>
+          <tr class="total-row"><td>Total</td><td>479</td><td>$534,795</td><td>$794,375</td><td class="pill-up">+48.5%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h4 style="font-size:13px;color:var(--muted);margin-bottom:10px;">India Stock Picks (INR in thousands)</h4>
+      <table>
+        <thead><tr><th>Year</th><th># Tickers</th><th>Cost (INR)</th><th>Current</th><th>Gain %</th></tr></thead>
+        <tbody>
+          <tr><td>2018</td><td>1</td><td>10</td><td>37</td><td class="pill-up">+265.9%</td></tr>
+          <tr><td>2021</td><td>19</td><td>5,015</td><td>5,885</td><td class="pill-up">+17.4%</td></tr>
+          <tr><td>2022</td><td>26</td><td>31,965</td><td>35,451</td><td class="pill-up">+10.9%</td></tr>
+          <tr><td>2023</td><td>37</td><td>15,430</td><td>18,266</td><td class="pill-up">+18.4%</td></tr>
+          <tr><td>2024</td><td>36</td><td>54,171</td><td>63,119</td><td class="pill-up">+16.5%</td></tr>
+          <tr><td>2025</td><td>7</td><td>512</td><td>554</td><td class="pill-up">+8.1%</td></tr>
+          <tr class="total-row"><td>Total</td><td>126</td><td>107,103</td><td>123,311</td><td class="pill-up">+15.1%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ============ NET WORTH & BALANCE SHEET ============ -->
+<div class="section">
+  <div class="section-title">Net Worth & Balance Sheet</div>
+  <div class="grid-2">
+    <div class="card" style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>Month</th><th>US PF</th><th>India PF</th><th>Home</th><th>Total Assets</th><th>Net Worth</th></tr></thead>
+        <tbody>
+          <tr><td>Mar 2025</td><td>$756,296</td><td>$649,690</td><td>$726,800</td><td>$2,132,786</td><td>$1,783,946</td></tr>
+          <tr><td>Apr 2025</td><td>$789,316</td><td>$671,439</td><td>$726,800</td><td>$2,187,555</td><td>$1,838,715</td></tr>
+          <tr><td>May 2025</td><td>$875,053</td><td>$709,205</td><td>$726,800</td><td>$2,311,058</td><td>$1,962,218</td></tr>
+          <tr><td>Jun 2025</td><td>$922,813</td><td>$752,437</td><td>$726,800</td><td>$2,402,050</td><td>$2,053,210</td></tr>
+          <tr><td>Jul 2025</td><td>$961,542</td><td>$731,896</td><td>$726,800</td><td>$2,420,239</td><td>$2,071,399</td></tr>
+          <tr><td>Aug 2025</td><td>$981,714</td><td>$707,659</td><td>$726,800</td><td>$2,416,173</td><td>$2,067,333</td></tr>
+          <tr><td>Sep 2025</td><td>$972,746</td><td>$700,137</td><td>$726,800</td><td>$2,399,683</td><td>$2,050,843</td></tr>
+          <tr><td>Oct 2025</td><td>$1,004,017</td><td>$709,092</td><td>$726,800</td><td>$2,439,909</td><td>$2,091,069</td></tr>
+          <tr><td>Nov 2025</td><td>$950,055</td><td>$699,672</td><td>$726,800</td><td>$2,376,527</td><td>$2,027,687</td></tr>
+          <tr><td>Dec 2025</td><td>$953,326</td><td>$676,209</td><td>$726,800</td><td>$2,356,335</td><td>$2,007,495</td></tr>
+          <tr><td>Jan 2026</td><td>$931,213</td><td>$662,333</td><td>$726,800</td><td>$2,320,346</td><td>$1,971,506</td></tr>
+          <tr><td>Feb 2026</td><td>$884,897</td><td>$651,113</td><td>$726,800</td><td>$2,262,810</td><td>$1,913,970</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="chart-wrap"><canvas id="netWorthChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PORTFOLIO GROWTH ============ -->
+<div class="section">
+  <div class="section-title">Portfolio Growth Analysis</div>
+  <div class="card">
+    <div style="height:320px;"><canvas id="growthChart"></canvas></div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<div class="footer">
+  Ravi & Kazumi Household &mdash; Confidential &mdash; Data as of February 28, 2026<br>
+  Returns calculated using Modified Dietz method (MWRR). Past performance is not indicative of future results.
+</div>
+
+<script>
+// Color palette
+const NAVY='#2C3E50', GOLD='#D4A843', RED='#C0392B', GREEN='#27AE60', BLUE='#3498DB', TEAL='#1ABC9C', PURPLE='#8E44AD', ORANGE='#E67E22';
+Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+Chart.defaults.font.size = 12;
+
+// ---- Performance Bar Chart ----
+new Chart(document.getElementById('perfChart'), {
+  type: 'bar',
+  data: {
+    labels: ['1M','3M','YTD','1Y','3Y'],
+    datasets: [
+      { label: 'Global', data: [-4.00,-7.67,-6.30,-1.21,20.78], backgroundColor: RED },
+      { label: 'US PF', data: [-5.60,-8.05,-7.90,2.47,21.49], backgroundColor: GREEN },
+      { label: 'India', data: [-0.30,-5.62,-4.60,1.57,23.34], backgroundColor: NAVY }
+    ]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top',labels:{boxWidth:12}}}, scales:{y:{ticks:{callback:v=>v+'%'}}} }
+});
+
+// ---- Annual Returns Bar ----
+new Chart(document.getElementById('annualChart'), {
+  type: 'bar',
+  data: {
+    labels: ['2024','2025','2026 YTD'],
+    datasets: [
+      { label:'Global', data:[34.21,-1.21,-2.34], backgroundColor:RED },
+      { label:'US PF', data:[30.91,11.94,-2.50], backgroundColor:GREEN },
+      { label:'India', data:[39.16,-7.40,-4.28], backgroundColor:NAVY }
+    ]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top',labels:{boxWidth:12}}}, scales:{y:{ticks:{callback:v=>v+'%'}}} }
+});
+
+// ---- US Account Doughnut ----
+new Chart(document.getElementById('usAccountChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Fidelity (Ravi)','Alight (401k)','Vanguard','Fidelity (Zu)','Utah 529','Empower (403b)','Others'],
+    datasets: [{ data: [344305,153533,117257,80532,45724,44003,99543], backgroundColor: [NAVY,GOLD,GREEN,BLUE,TEAL,PURPLE,ORANGE] }]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11}}}} }
+});
+
+// ---- Purpose Doughnut ----
+new Chart(document.getElementById('purposeChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Non-Retirement / Liquid','Retirement','529 Education','Crypto'],
+    datasets: [{ data: [569823,215524,75724,23826], backgroundColor: [NAVY,GOLD,GREEN,ORANGE] }]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11}}}} }
+});
+
+// ---- Global Split ----
+new Chart(document.getElementById('globalSplitChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['US Portfolio','India Portfolio'],
+    datasets: [{ data: [931213,662333], backgroundColor: [NAVY,GOLD] }]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom',labels:{boxWidth:10}}} }
+});
+
+// ---- US Asset Class ----
+new Chart(document.getElementById('usAssetChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Individual Stocks','Index Funds/ETFs','Crypto','Cash & Other'],
+    datasets: [{ data: [486068,386948,30036,28161], backgroundColor: [NAVY,GOLD,ORANGE,TEAL] }]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}} }
+});
+
+// ---- Net Worth Line ----
+const nwMonths = ['Mar 25','Apr 25','May 25','Jun 25','Jul 25','Aug 25','Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26'];
+new Chart(document.getElementById('netWorthChart'), {
+  type: 'line',
+  data: {
+    labels: nwMonths,
+    datasets: [
+      { label:'Net Worth', data:[1783946,1838715,1962218,2053210,2071399,2067333,2050843,2091069,2027687,2007495,1971506,1913970], borderColor:NAVY, backgroundColor:'rgba(44,62,80,.08)', fill:true, tension:.3 },
+      { label:'Total Assets', data:[2132786,2187555,2311058,2402050,2420239,2416173,2399683,2439909,2376527,2356335,2320346,2262810], borderColor:GOLD, borderDash:[5,3], fill:false, tension:.3 }
+    ]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top',labels:{boxWidth:12}}}, scales:{y:{ticks:{callback:v=>'$'+(v/1e6).toFixed(1)+'M'}}} }
+});
+
+// ---- Portfolio Growth ----
+new Chart(document.getElementById('growthChart'), {
+  type: 'line',
+  data: {
+    labels: ['2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026'],
+    datasets: [
+      { label:'Your Portfolio', data:[250000,310000,380000,420000,480000,490000,680000,810000,870000,950000,1050000], borderColor:NAVY, borderWidth:2.5, pointRadius:4, tension:.3 },
+      { label:'3-Fund 80/20 Benchmark', data:[250000,290000,340000,380000,430000,480000,620000,710000,780000,870000,1000000], borderColor:GOLD, borderWidth:2.5, pointRadius:4, tension:.3 }
+    ]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top',labels:{boxWidth:12}}}, scales:{y:{ticks:{callback:v=>'$'+(v/1000)+'K'}}} }
+});
+
+// ---- Holdings Table ----
+const holdings = [
+  ['Index Funds','-','$227,997','$386,948','$158,951','+69.7%'],
+  ['NET','309','$22,317','$54,769','$32,452','+145.4%'],
+  ['SHOP','426','$41,186','$53,717','$12,531','+30.4%'],
+  ['AMZN','232','$17,820','$48,841','$31,020','+174.1%'],
+  ['GOOGL','138','$14,297','$43,413','$29,116','+203.7%'],
+  ['CNSWF','20','$32,765','$36,357','$3,592','+11.0%'],
+  ['SHW','98','$29,014','$35,400','$6,386','+22.0%'],
+  ['MEDP','75','$25,617','$34,191','$8,573','+33.5%'],
+  ['CRWD','78','$15,768','$30,297','$14,530','+92.1%'],
+  ['TOITF','449','$30,462','$29,529','-$933','-3.1%'],
+  ['MSFT','72','$12,223','$28,415','$16,192','+132.5%'],
+  ['BTC','0','$37,655','$25,308','-$12,347','-32.8%'],
+  ['TTD','567','$29,459','$14,220','-$15,239','-51.7%'],
+  ['MELI','5','$5,903','$10,871','$4,968','+84.1%'],
+  ['CPRT','288','$11,880','$10,492','-$1,388','-11.7%'],
+  ['ADYEY','855','$6,479','$10,098','$3,619','+55.9%'],
+  ['SFM','127','$8,490','$8,580','$90','+1.1%'],
+  ['DDOG','66','$10,293','$7,608','-$2,686','-26.1%'],
+  ['CVNA','22','$1,526','$7,265','$5,739','+376.2%'],
+  ['ASML','4','$2,624','$6,371','$3,747','+142.8%'],
+  ['CELH','123','$3,027','$5,926','$2,899','+95.8%'],
+  ['ETH','2','$6,063','$4,728','-$1,335','-22.0%'],
+  ['LMGIF','239','$6,421','$3,405','-$3,016','-47.0%'],
+  ['KNSL','5','$2,024','$1,892','-$132','-6.5%'],
+  ['NFLX','18','$378','$1,401','$1,023','+270.8%']
+];
+const hBody = document.getElementById('holdingsBody');
+holdings.forEach(r => {
+  const pl = r[5];
+  const cls = pl.startsWith('+') ? 'pill-up' : pl.startsWith('-') ? 'pill-down' : '';
+  const plCls = r[4].startsWith('-') ? 'pill-down' : 'pill-up';
+  hBody.innerHTML += `<tr><td><strong>${r[0]}</strong></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td class="${plCls}">${r[4]}</td><td class="${cls}">${r[5]}</td></tr>`;
+});
+</script>
+</body>
+</html>
